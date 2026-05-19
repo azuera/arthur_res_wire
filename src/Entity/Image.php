@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ImageRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[ApiResource]
 class Image
 {
     #[ORM\Id]
@@ -22,7 +24,7 @@ class Image
     #[ORM\Column]
     private ?int $displayOrder = null;
 
-    #[ORM\ManyToOne(inversedBy: 'image')]
+    #[ORM\ManyToOne(inversedBy: 'images')]  // ← CORRIGÉ : 'image' → 'images'
     private ?Product $product = null;
 
     public function getId(): ?int
@@ -38,7 +40,6 @@ class Image
     public function setUrl(string $url): static
     {
         $this->url = $url;
-
         return $this;
     }
 
@@ -50,7 +51,6 @@ class Image
     public function setAltText(?string $altText): static
     {
         $this->altText = $altText;
-
         return $this;
     }
 
@@ -62,7 +62,6 @@ class Image
     public function setDisplayOrder(int $displayOrder): static
     {
         $this->displayOrder = $displayOrder;
-
         return $this;
     }
 
@@ -74,9 +73,6 @@ class Image
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
-
         return $this;
     }
-
-    
 }

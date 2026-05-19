@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\InvoiceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
+#[ApiResource]
 class Invoice
 {
     #[ORM\Id]
@@ -33,10 +35,8 @@ class Invoice
     /**
      * @var Collection<int, ProductKey>
      */
-    #[ORM\OneToMany(targetEntity: ProductKey::class, mappedBy: 'invoice')]
+    #[ORM\OneToMany(targetEntity: ProductKey::class, mappedBy: 'invoice')]  // ← CORRIGÉ : targetEntity ProductKey au lieu de Product
     private Collection $productKeys;
-
-    
 
     #[ORM\ManyToOne(inversedBy: 'invoices')]
     private ?PayementMethod $paymentMethod = null;
@@ -59,7 +59,6 @@ class Invoice
     public function setNumber(string $number): static
     {
         $this->number = $number;
-
         return $this;
     }
 
@@ -71,7 +70,6 @@ class Invoice
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -83,7 +81,6 @@ class Invoice
     public function setTotalAmount(float $totalAmount): static
     {
         $this->totalAmount = $totalAmount;
-
         return $this;
     }
 
@@ -95,7 +92,6 @@ class Invoice
     public function setStatus(string $status): static
     {
         $this->status = $status;
-
         return $this;
     }
 
@@ -107,7 +103,6 @@ class Invoice
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -125,19 +120,16 @@ class Invoice
             $this->productKeys->add($productKey);
             $productKey->setInvoice($this);
         }
-
         return $this;
     }
 
     public function removeProductKey(ProductKey $productKey): static
     {
         if ($this->productKeys->removeElement($productKey)) {
-            // set the owning side to null (unless already changed)
             if ($productKey->getInvoice() === $this) {
                 $productKey->setInvoice(null);
             }
         }
-
         return $this;
     }
 
@@ -149,8 +141,6 @@ class Invoice
     public function setPaymentMethod(?PayementMethod $paymentMethod): static
     {
         $this->paymentMethod = $paymentMethod;
-
         return $this;
     }
-
 }

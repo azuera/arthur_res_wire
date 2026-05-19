@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ApiResource]
 class Product
 {
     #[ORM\Id]
@@ -49,12 +51,24 @@ class Product
     #[ORM\ManyToMany(targetEntity: Platform::class, inversedBy: 'products')]
     private Collection $plateform;
 
+    /**
+     * @var Collection<int, Image>
+     */
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: Image::class)]
+    private Collection $images;
+
+    /**
+     * @var Collection<int, ProductKey>
+     */
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductKey::class)]
+    private Collection $productKeys;
+
     public function __construct()
     {
         $this->plateform = new ArrayCollection();
+        $this->images = new ArrayCollection();
+        $this->productKeys = new ArrayCollection();
     }
-
-   
 
     public function getId(): ?int
     {
@@ -69,7 +83,6 @@ class Product
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -81,7 +94,6 @@ class Product
     public function setQuantity(int $quantity): static
     {
         $this->quantity = $quantity;
-
         return $this;
     }
 
@@ -93,7 +105,6 @@ class Product
     public function setReleaseDate(\DateTime $releaseDate): static
     {
         $this->releaseDate = $releaseDate;
-
         return $this;
     }
 
@@ -105,7 +116,6 @@ class Product
     public function setRegion(string $region): static
     {
         $this->region = $region;
-
         return $this;
     }
 
@@ -117,7 +127,6 @@ class Product
     public function setPrice(float $price): static
     {
         $this->price = $price;
-
         return $this;
     }
 
@@ -129,7 +138,6 @@ class Product
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -141,7 +149,6 @@ class Product
     public function setRating(?float $rating): static
     {
         $this->rating = $rating;
-
         return $this;
     }
 
@@ -153,7 +160,6 @@ class Product
     public function setTags(array $tags): static
     {
         $this->tags = $tags;
-
         return $this;
     }
 
@@ -165,7 +171,6 @@ class Product
     public function setRequiredConfiguration(?string $requiredConfiguration): static
     {
         $this->requiredConfiguration = $requiredConfiguration;
-
         return $this;
     }
 
@@ -182,24 +187,66 @@ class Product
         if (!$this->plateform->contains($plateform)) {
             $this->plateform->add($plateform);
         }
-
         return $this;
     }
 
     public function removePlateform(Platform $plateform): static
     {
         $this->plateform->removeElement($plateform);
-
         return $this;
     }
 
-   
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
 
-  
+    public function addImage(Image $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setProduct($this);
+        }
+        return $this;
+    }
 
-    
-   
+    public function removeImage(Image $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            if ($image->getProduct() === $this) {
+                $image->setProduct(null);
+            }
+        }
+        return $this;
+    }
 
-   
-   
+    /**
+     * @return Collection<int, ProductKey>
+     */
+    public function getProductKeys(): Collection
+    {
+        return $this->productKeys;
+    }
+
+    public function addProductKey(ProductKey $productKey): static
+    {
+        if (!$this->productKeys->contains($productKey)) {
+            $this->productKeys->add($productKey);
+            $productKey->setProduct($this);
+        }
+        return $this;
+    }
+
+    public function removeProductKey(ProductKey $productKey): static
+    {
+        if ($this->productKeys->removeElement($productKey)) {
+            if ($productKey->getProduct() === $this) {
+                $productKey->setProduct(null);
+            }
+        }
+        return $this;
+    }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProductKeyRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductKeyRepository::class)]
+#[ApiResource]
 class ProductKey
 {
     #[ORM\Id]
@@ -38,7 +40,6 @@ class ProductKey
     public function setNumber(string $number): static
     {
         $this->number = $number;
-
         return $this;
     }
 
@@ -50,7 +51,6 @@ class ProductKey
     public function setDatetime(\DateTime $datetime): static
     {
         $this->datetime = $datetime;
-
         return $this;
     }
 
@@ -62,7 +62,6 @@ class ProductKey
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
-
         return $this;
     }
 
@@ -74,9 +73,6 @@ class ProductKey
     public function setInvoice(?Invoice $invoice): static
     {
         $this->invoice = $invoice;
-
         return $this;
     }
-
-    
 }
