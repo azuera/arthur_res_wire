@@ -110,4 +110,10 @@ class PayementMethod
     }
 
 
+    public function __toString(): string
+    {
+        return $this->type . ' (**** ' . $this->lastDigits . ')';
+    }
+
+
 }

@@ -75,4 +75,10 @@ class Image
         $this->product = $product;
         return $this;
     }
+
+
+    public function __toString(): string
+    {
+        return $this->altText ?? 'Image #' . $this->id;
+    }
 }

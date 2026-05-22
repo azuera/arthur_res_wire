@@ -143,4 +143,10 @@ class Invoice
         $this->paymentMethod = $paymentMethod;
         return $this;
     }
+
+
+    public function __toString(): string
+    {
+        return $this->number ?? 'Facture #' . $this->id;
+    }
 }

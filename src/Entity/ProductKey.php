@@ -75,4 +75,10 @@ class ProductKey
         $this->invoice = $invoice;
         return $this;
     }
+
+
+    public function __toString(): string
+    {
+        return $this->number ?? 'Clé #' . $this->id;
+    }
 }
