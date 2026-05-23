@@ -3,25 +3,45 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ProductKeyRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductKeyRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    security: "is_granted('ROLE_USER')",
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['productkey:read']],
+            security: "is_granted('ROLE_USER')",
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['productkey:read']],
+            // Seul le propriétaire de la facture liée peut voir la clé
+            security: "is_granted('ROLE_USER') and object.getInvoice().getUser() == user",
+        ),
+    ],
+)]
 class ProductKey
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['productkey:read', 'invoice:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['productkey:read', 'invoice:read'])]
     private ?string $number = null;
 
     #[ORM\Column]
+    #[Groups(['productkey:read', 'invoice:read'])]
     private ?\DateTime $datetime = null;
 
     #[ORM\ManyToOne(inversedBy: 'productKeys')]
+    #[Groups(['productkey:read'])]
     private ?Product $product = null;
 
     #[ORM\ManyToOne(inversedBy: 'productKeys')]
@@ -75,7 +95,6 @@ class ProductKey
         $this->invoice = $invoice;
         return $this;
     }
-
 
     public function __toString(): string
     {

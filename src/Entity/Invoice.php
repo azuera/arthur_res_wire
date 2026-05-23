@@ -3,42 +3,77 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\InvoiceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    security: "is_granted('ROLE_USER')",
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['invoice:read']],
+            security: "is_granted('ROLE_USER')",
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['invoice:read']],
+            // Seul le propriétaire peut voir SA facture
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
+        ),
+        new Post(
+            security: "is_granted('ROLE_USER')",
+            denormalizationContext: ['groups' => ['invoice:write']],
+        ),
+        new Patch(
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
+            denormalizationContext: ['groups' => ['invoice:write']],
+        ),
+        new Delete(
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
+        ),
+    ],
+)]
 class Invoice
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['invoice:read', 'user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['invoice:read', 'invoice:write', 'user:read'])]
     private ?string $number = null;
 
     #[ORM\Column]
+    #[Groups(['invoice:read', 'invoice:write', 'user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['invoice:read', 'invoice:write', 'user:read'])]
     private ?float $totalAmount = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['invoice:read', 'invoice:write', 'user:read'])]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'invoices')]
+    #[Groups(['invoice:read'])]
     private ?User $user = null;
 
-    /**
-     * @var Collection<int, ProductKey>
-     */
-    #[ORM\OneToMany(targetEntity: ProductKey::class, mappedBy: 'invoice')]  // ← CORRIGÉ : targetEntity ProductKey au lieu de Product
+    #[ORM\OneToMany(targetEntity: ProductKey::class, mappedBy: 'invoice')]
+    #[Groups(['invoice:read'])]
     private Collection $productKeys;
 
     #[ORM\ManyToOne(inversedBy: 'invoices')]
+    #[Groups(['invoice:read'])]
     private ?PayementMethod $paymentMethod = null;
 
     public function __construct()
@@ -106,9 +141,6 @@ class Invoice
         return $this;
     }
 
-    /**
-     * @return Collection<int, ProductKey>
-     */
     public function getProductKeys(): Collection
     {
         return $this->productKeys;
@@ -125,11 +157,7 @@ class Invoice
 
     public function removeProductKey(ProductKey $productKey): static
     {
-        if ($this->productKeys->removeElement($productKey)) {
-            if ($productKey->getInvoice() === $this) {
-                $productKey->setInvoice(null);
-            }
-        }
+        if ($this->productKeys->removeElement($productKey) && $productKey->getInvoice() === $this) $productKey->setInvoice(null);
         return $this;
     }
 
@@ -143,7 +171,6 @@ class Invoice
         $this->paymentMethod = $paymentMethod;
         return $this;
     }
-
 
     public function __toString(): string
     {

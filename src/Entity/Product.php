@@ -3,65 +3,96 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['product:read']]),
+        new Get(normalizationContext: ['groups' => ['product:read']]),
+        new Post(
+            security: "is_granted('ROLE_USER')",
+            normalizationContext: ['groups' => ['product:read']],
+            denormalizationContext: ['groups' => ['product:write']],
+        ),
+        new Put(
+            security: "is_granted('ROLE_USER')",
+            normalizationContext: ['groups' => ['product:read']],
+            denormalizationContext: ['groups' => ['product:write']],
+        ),
+        new Patch(
+            security: "is_granted('ROLE_USER')",
+            normalizationContext: ['groups' => ['product:read']],
+            denormalizationContext: ['groups' => ['product:write']],
+        ),
+        new Delete(security: "is_granted('ROLE_USER')"),
+    ],
+)]
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['product:read', 'product:write'])]
     private ?string $title = null;
 
     #[ORM\Column]
+    #[Groups(['product:read', 'product:write'])]
     private ?int $quantity = null;
 
     #[ORM\Column]
+    #[Groups(['product:read', 'product:write'])]
     private ?\DateTime $releaseDate = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['product:read', 'product:write'])]
     private ?string $region = null;
 
     #[ORM\Column]
+    #[Groups(['product:read', 'product:write'])]
     private ?float $price = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['product:read', 'product:write'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['product:read', 'product:write'])]
     private ?float $rating = null;
 
     #[ORM\Column]
+    #[Groups(['product:read', 'product:write'])]
     private array $tags = [];
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['product:read', 'product:write'])]
     private ?string $requiredConfiguration = null;
 
-    /**
-     * @var Collection<int, Platform>
-     */
     #[ORM\ManyToMany(targetEntity: Platform::class, inversedBy: 'products')]
+    #[Groups(['product:read'])]
     private Collection $plateform;
 
-    /**
-     * @var Collection<int, Image>
-     */
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Image::class)]
+    #[Groups(['product:read'])]
     private Collection $images;
 
-    /**
-     * @var Collection<int, ProductKey>
-     */
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductKey::class)]
-    private Collection $productKeys;
+    private Collection $productKeys; // jamais exposé publiquement
 
     public function __construct()
     {
@@ -168,15 +199,12 @@ class Product
         return $this->requiredConfiguration;
     }
 
-    public function setRequiredConfiguration(?string $requiredConfiguration): static
+    public function setRequiredConfiguration(?string $v): static
     {
-        $this->requiredConfiguration = $requiredConfiguration;
+        $this->requiredConfiguration = $v;
         return $this;
     }
 
-    /**
-     * @return Collection<int, Platform>
-     */
     public function getPlateform(): Collection
     {
         return $this->plateform;
@@ -184,9 +212,7 @@ class Product
 
     public function addPlateform(Platform $plateform): static
     {
-        if (!$this->plateform->contains($plateform)) {
-            $this->plateform->add($plateform);
-        }
+        if (!$this->plateform->contains($plateform)) $this->plateform->add($plateform);
         return $this;
     }
 
@@ -196,9 +222,6 @@ class Product
         return $this;
     }
 
-    /**
-     * @return Collection<int, Image>
-     */
     public function getImages(): Collection
     {
         return $this->images;
@@ -215,17 +238,10 @@ class Product
 
     public function removeImage(Image $image): static
     {
-        if ($this->images->removeElement($image)) {
-            if ($image->getProduct() === $this) {
-                $image->setProduct(null);
-            }
-        }
+        if ($this->images->removeElement($image) && $image->getProduct() === $this) $image->setProduct(null);
         return $this;
     }
 
-    /**
-     * @return Collection<int, ProductKey>
-     */
     public function getProductKeys(): Collection
     {
         return $this->productKeys;
@@ -242,14 +258,9 @@ class Product
 
     public function removeProductKey(ProductKey $productKey): static
     {
-        if ($this->productKeys->removeElement($productKey)) {
-            if ($productKey->getProduct() === $this) {
-                $productKey->setProduct(null);
-            }
-        }
+        if ($this->productKeys->removeElement($productKey) && $productKey->getProduct() === $this) $productKey->setProduct(null);
         return $this;
     }
-
 
     public function __toString(): string
     {
