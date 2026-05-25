@@ -41,6 +41,8 @@ security:
         - { path: ^/api/products,       roles: PUBLIC_ACCESS }
         - { path: ^/api/images,         roles: PUBLIC_ACCESS }
         - { path: ^/api/platforms,      roles: PUBLIC_ACCESS }
+        # — Inscription publique —
+        - { path: ^/api/users,           roles: PUBLIC_ACCESS, methods: [ POST ] }
         # — Ressources privées —
         - { path: ^/api/invoices,       roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/payment_methods,roles: IS_AUTHENTICATED_FULLY }

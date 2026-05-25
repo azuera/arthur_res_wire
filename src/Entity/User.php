@@ -28,17 +28,25 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Post(
             normalizationContext: ['groups' => ['user:read']],
             denormalizationContext: ['groups' => ['user:write']],
+        // pas de security ici → public pour l'inscription
         ),
-        new Get(normalizationContext: ['groups' => ['user:read']]),
+        new Get(
+            normalizationContext: ['groups' => ['user:read']],
+            security: "is_granted('ROLE_USER') and object == user",
+        ),
         new Put(
             normalizationContext: ['groups' => ['user:read']],
             denormalizationContext: ['groups' => ['user:write']],
+            security: "is_granted('ROLE_USER') and object == user",
         ),
         new Patch(
             normalizationContext: ['groups' => ['user:read']],
             denormalizationContext: ['groups' => ['user:write']],
+            security: "is_granted('ROLE_USER') and object == user",
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_USER') and object == user",
+        ),
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],

@@ -18,6 +18,11 @@ class UserHashPasswordListener
 
     public function prePersist(User $user, LifecycleEventArgs $args): void
     {
+
+        if (empty($user->getRoles()) || $user->getRoles() === ['ROLE_USER']) {
+            $user->setRoles(['ROLE_USER']);
+        }
+
         $this->hashPassword($user);
     }
 

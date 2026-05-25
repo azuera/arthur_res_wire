@@ -98,6 +98,7 @@ class ProductKey
 
     public function __toString(): string
     {
-        return $this->number ?? 'Clé #' . $this->id;
+        $gameName = $this->product ? $this->product->getTitle() : 'Sans produit';
+        return $gameName . ' — ' . ($this->number ?? '');
     }
 }
