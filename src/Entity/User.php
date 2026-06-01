@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -22,13 +24,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
+#[ApiFilter(SearchFilter::class, properties: ['email' => 'exact'])]
 #[ApiResource(
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['user:read']]),
         new Post(
             normalizationContext: ['groups' => ['user:read']],
             denormalizationContext: ['groups' => ['user:write']],
-        // pas de security ici → public pour l'inscription
         ),
         new Get(
             normalizationContext: ['groups' => ['user:read']],

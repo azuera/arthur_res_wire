@@ -1,5 +1,5 @@
 <?php
-// src/DataFixtures/ProductFixtures.php
+
 
 namespace App\DataFixtures;
 

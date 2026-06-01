@@ -21,22 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['product:read']]),
         new Get(normalizationContext: ['groups' => ['product:read']]),
-        new Post(
-            security: "is_granted('ROLE_USER')",
-            normalizationContext: ['groups' => ['product:read']],
-            denormalizationContext: ['groups' => ['product:write']],
-        ),
-        new Put(
-            security: "is_granted('ROLE_USER')",
-            normalizationContext: ['groups' => ['product:read']],
-            denormalizationContext: ['groups' => ['product:write']],
-        ),
-        new Patch(
-            security: "is_granted('ROLE_USER')",
-            normalizationContext: ['groups' => ['product:read']],
-            denormalizationContext: ['groups' => ['product:write']],
-        ),
-        new Delete(security: "is_granted('ROLE_USER')"),
+
     ],
 )]
 class Product
@@ -92,7 +77,7 @@ class Product
     private Collection $images;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductKey::class)]
-    private Collection $productKeys; // jamais exposé publiquement
+    private Collection $productKeys;
 
     public function __construct()
     {
@@ -264,6 +249,6 @@ class Product
 
     public function __toString(): string
     {
-        return $this->title ?? 'Produit sans titre';
+        return $this->title ?? 'Produit';
     }
 }

@@ -1,5 +1,4 @@
 <?php
-// src/Controller/Admin/ProductCrudController.php
 
 namespace App\Controller\Admin;
 
@@ -13,7 +12,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -52,14 +50,15 @@ class ProductCrudController extends AbstractCrudController
             ArrayField::new('tags', 'Tags'),
             TextareaField::new('requiredConfiguration', 'Configuration requise')->hideOnIndex(),
             AssociationField::new('plateform', 'Plateformes')
-                ->setFormTypeOptions([
-                    'by_reference' => false,
-                ])
+                ->setFormTypeOptions(['by_reference' => false])
                 ->formatValue(function ($value, $entity) {
-                    return implode(', ', $entity->getPlateform()->map(function($p) {
+                    $platforms = $entity->getPlateform()->map(function($p) {
                         return $p->getName();
-                    })->toArray());
+                    })->toArray();
+                    return implode(', ', $platforms);
                 }),
+
+            // ✅ Uniquement l'affichage du nombre d'images dans la liste
             AssociationField::new('images', 'Images')
                 ->onlyOnIndex()
                 ->formatValue(function ($value, $entity) {
