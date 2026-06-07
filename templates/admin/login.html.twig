@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin — Connexion</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0f2744;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: sans-serif;
+        }
+        .login-card {
+            background: #1e3a5f;
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 32px;
+            letter-spacing: 2px;
+        }
+        .error {
+            background: rgba(239,68,68,0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        label { font-size: 13px; color: #9ca3af; }
+        input {
+            background: #0f2744;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 12px 14px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+        input:focus { border-color: #f97316; }
+        button {
+            width: 100%;
+            background: #f97316;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        button:hover { background: #ea6c0a; }
+    </style>
+</head>
+<body>
+<div class="login-card">
+    <h1>GAMESHIFT ADMIN</h1>
+
+    {% if error %}
+        <div class="error">{{ error.messageKey | trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    <form method="post">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="_username"
+                   value="{{ last_username }}" placeholder="admin@example.com" />
+        </div>
+        <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="_password"
+                   placeholder="Votre mot de passe" />
+        </div>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
+        <button type="submit">Se connecter</button>
+    </form>
+</div>
+</body>
+</html>

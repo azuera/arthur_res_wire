@@ -76,6 +76,8 @@ class Invoice
     #[Groups(['invoice:read'])]
     private ?PayementMethod $paymentMethod = null;
 
+
+
     public function __construct()
     {
         $this->productKeys = new ArrayCollection();
@@ -170,6 +172,11 @@ class Invoice
     {
         $this->paymentMethod = $paymentMethod;
         return $this;
+    }
+    #[Groups(['invoice:read'])]
+    public function getInvoiceNumber(): ?string
+    {
+        return $this->number;
     }
 
     public function __toString(): string

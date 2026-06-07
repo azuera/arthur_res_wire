@@ -1,4 +1,3 @@
-# config/packages/security.yaml
 security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
@@ -13,6 +12,18 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
+        admin:
+            pattern: ^/admin
+            provider: app_user_provider
+            form_login:
+                login_path: admin_login
+                check_path: admin_login
+                default_target_path: /admin
+            logout:
+                path: /admin/logout
+                target: /admin/login
+            access_denied_handler: App\Security\AdminAccessDeniedHandler
 
         login:
             pattern: ^/api/login
@@ -35,27 +46,16 @@ security:
             provider: app_user_provider
 
     access_control:
+        - { path: ^/admin/login,        roles: PUBLIC_ACCESS }
+        - { path: ^/admin,              roles: ROLE_ADMIN }
         - { path: ^/api/login_check,    roles: PUBLIC_ACCESS }
         - { path: ^/api/docs,           roles: PUBLIC_ACCESS }
-        # — Ressources publiques —
         - { path: ^/api/products,       roles: PUBLIC_ACCESS }
         - { path: ^/api/images,         roles: PUBLIC_ACCESS }
         - { path: ^/api/platforms,      roles: PUBLIC_ACCESS }
-        # — Inscription publique —
-        - { path: ^/api/users,           roles: PUBLIC_ACCESS, methods: [ POST ] }
-        # — Ressources privées —
+        - { path: ^/api/users,          roles: PUBLIC_ACCESS, methods: [POST] }
         - { path: ^/api/invoices,       roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/payment_methods,roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/product_keys,   roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/users,          roles: IS_AUTHENTICATED_FULLY }
-        # — Tout le reste —
         - { path: ^/api,                roles: IS_AUTHENTICATED_FULLY }
-
-when@test:
-    security:
-        password_hashers:
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4
-                time_cost: 3
-                memory_cost: 10
