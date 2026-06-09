@@ -60,7 +60,6 @@ class InvoiceCrudController extends AbstractCrudController
         yield AssociationField::new('paymentMethod', 'Moyen de paiement')
             ->setRequired(false);
 
-        // Maintenant ça va marcher car le ProductKeyRepository est correct !
         yield AssociationField::new('productKeys', 'Clés produit disponibles')
             ->setFormTypeOptions([
                 'class' => ProductKey::class,

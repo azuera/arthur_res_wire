@@ -30,12 +30,11 @@ class Image
     #[Groups(['image:read', 'product:read'])]
     private ?int $id = null;
 
-    // ✅ Ce champ stocke le chemin ou le nom du fichier en BDD
     #[ORM\Column(length: 255)]
     #[Groups(['image:read', 'image:write', 'product:read'])]
     private ?string $url = null;
 
-    // ✅ Ce champ est le fichier uploadé (non persisté en BDD)
+
     #[Vich\UploadableField(mapping: 'product_images', fileNameProperty: 'url')]
     private ?File $imageFile = null;
 
@@ -51,7 +50,6 @@ class Image
     #[Groups(['image:read'])]
     private ?Product $product = null;
 
-    // 👉 OBLIGATOIRE pour que VichUploader fonctionne
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
@@ -71,7 +69,7 @@ class Image
         return $this;
     }
 
-    // ✅ Getter et Setter pour le fichier uploadé
+
     public function getImageFile(): ?File
     {
         return $this->imageFile;

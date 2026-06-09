@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Get(
             normalizationContext: ['groups' => ['invoice:read']],
-            // Seul le propriétaire peut voir SA facture
+
             security: "is_granted('ROLE_USER') and object.getUser() == user",
         ),
         new Post(

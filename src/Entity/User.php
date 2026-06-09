@@ -177,7 +177,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(?string $plainPassword): static
     {
         $this->plainPassword = $plainPassword;
-        // Force Doctrine à détecter un changement sur l'entité
+
         $this->password = null;
 
         return $this;

@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Get(
             normalizationContext: ['groups' => ['productkey:read']],
-            // Seul le propriétaire de la facture liée peut voir la clé
+
             security: "is_granted('ROLE_USER') and object.getInvoice().getUser() == user",
         ),
     ],
